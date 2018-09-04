@@ -1,5 +1,5 @@
 // tslint:disable:no-console
-// tslint:disabl:ordered-imports
+// tslint:disable:ordered-imports
 import * as React from "react";
 import {
   ConnectableObservable,
@@ -10,18 +10,14 @@ import {
   timer
 } from "rxjs";
 import {
-  // bufferCount,
   delay,
-  // filter,
   map,
   mergeMap,
   publish,
-  // shareReplay,
+  shareReplay,
   take,
   tap
 } from "rxjs/internal/operators";
-
-// import { componentFromStream } from 'recompose';
 
 /// Timer for console
 const t = timer(1000, 1000).pipe(take(100));
@@ -85,16 +81,16 @@ function showAd(ads: ReadonlyArray<Ad> | Ad): Observable<Ad> {
 }
 
 const clickHandler = () => {
-  // refreshedAds$
-  //   .pipe(mergeMap(refreshedAd => showAd(refreshedAd)))
-  //   .subscribe({
-  //     complete: () => {
-  //       console.log('-- in click closed!')
-  //     },
-  //     next: (o) => {
-  //       console.log('-- in click:', o)
-  //     }
-  //   });
+  refreshedAds$
+    .pipe(mergeMap(refreshedAd => showAd(refreshedAd)))
+    .subscribe({
+      complete: () => {
+        console.log('-- in click closed!')
+      },
+      next: (o) => {
+        console.log('-- in click:', o)
+      }
+    });
 };
 
 function onLoad(ads: ReadonlyArray<string>): Observable<Ad> {
@@ -109,12 +105,17 @@ function onLoad(ads: ReadonlyArray<string>): Observable<Ad> {
 
   return runAuction(adObjects)
     .pipe(mergeMap(ad => refreshAd(ad)))
-    .pipe(mergeMap(refreshedAd => showAd(refreshedAd)));
-  // .pipe(mergeMap(ad => refreshAd(ad)))
-  // .pipe(shareReplay(4))
+    .pipe(mergeMap(refreshedAd => showAd(refreshedAd)))
+    .pipe(mergeMap(ad => refreshAd(ad)))
+    // The next subscription while replay the last 4 events emitted and
+    // continue subscribing to observable. This means if 4 ads are refreshed,
+    // all 4 will get displayed, but if only one or two ads are refreshed,
+    // only one or two will get displayed, but the next ads that are refreshing
+    // will _automatically_ get displayed when they're done
+    .pipe(shareReplay(4));
 }
 
-const newAds: ReadonlyArray<string> = ["ad-1"];
+const newAds: ReadonlyArray<string> = ["ad-1", "ad-2", "ad-3", "ad-4"];
 const refreshedAds$ = onLoad(newAds) as ConnectableObservable<Ad>;
 const onLoadSub = refreshedAds$.subscribe({
   complete: () => {
@@ -125,24 +126,7 @@ const onLoadSub = refreshedAds$.subscribe({
   }
 });
 
-// const renderAd: React.SFC<Ad> = (props) => {
-//   console.log('renderAd Props: ', props);
-//   const { id, auctioned, refreshed, visible } = props;
-//   return <div key={id}>
-//     id: {id}
-//     auctioned: {String(auctioned)}
-//     refreshed: {String(refreshed)}
-//     visible: {String(visible)}
-//   </div>
-// }
-
-// const AdThing = componentFromStream(() => {
-//   // const ad1$ = refreshedAds$
-//   //   .pipe(filter(ad => ad.id === "ad-1"));
-//   // return refreshedAds$.pipe(map(ad => ({ ...ad })), map(renderAd));
-// });
-// console.log(AdThing);
-export default function rxPlayground(props: Ad): JSX.Element {
+export default function rxPlaygroundButtonClick(props: Ad): JSX.Element {
   return (
     <React.Fragment>
       <h1>{props.id}</h1>

@@ -10,27 +10,18 @@ import {
   timer
 } from "rxjs";
 import {
-  // bufferCount,
   concatMap,
-  // filter,
   delay,
   map,
-  // publish,
-  // shareReplay,
   mergeMap,
   take,
   tap
 } from "rxjs/internal/operators";
 
-// import { componentFromStream } from 'recompose';
-
 /// Timer for console
 timer(1000, 1000)
   .pipe(take(100))
   .subscribe(val => console.log("timer: ", val));
-// const hot = t.pipe(publish()) as ConnectableObservable<number>;
-// hot.connect();
-// hot.subscribe(val => console.log("timer: ", val));
 
 type Ad = {
   readonly id: string;
