@@ -3,9 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "contentful": "^7.0.3",
-    "hashids": "^1.1.4",
-    "js-sha256": "^0.9.0",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
     "react-gpt": "^2.0.1",
